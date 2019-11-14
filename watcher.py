@@ -1,35 +1,39 @@
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 import logging
+import os
 logging.basicConfig(level=logging.INFO,
                         format='%(asctime)s - %(message)s',
                         datefmt='%Y-%m-%d %H:%M:%S')
-
 class brcWatcher(FileSystemEventHandler):
+    file_name = 'unset'
+    processed = False
+    dirName = 'files'
+    error = False
+
     def on_moved(self, event: FileSystemEvent):
         super(brcWatcher, self).on_moved(event)
-        what = 'directory' if event.is_directory else 'file'
-        logging.info("Moved %s: from %s to %s", what, event.src_path,
-                     event.dest_path)
+        #Make sure a filename has been set.
+        if (self.file_name == 'unset'):
+            return
+        #Make sure the file isn't being removed.
+        if (self.dirName not in event.dest_path or self.dirName in event.src_path):
+            return
+        
+        #move the file
+        try:
+            os.rename(f'{os.getcwd()}/{self.dirName}/{event.src_path[2:]}', f'{os.getcwd()}/{self.dirName}/{self.file_name}.txt')
+            self.processed = True
+        except(Exception):
+            print(Exception.with_traceback())
+            self.processed = False
+            self.error = True
 
-    def on_created(self, event):
-        super(brcWatcher, self).on_created(event)
-        print("file created wohoo")
-        what = 'directory' if event.is_directory else 'file'
-        logging.info("Created %s: %s", what, event.src_path)
-
-    def on_deleted(self, event):
-        super(brcWatcher, self).on_deleted(event)
-
-        what = 'directory' if event.is_directory else 'file'
-        logging.info("Deleted %s: %s", what, event.src_path)
-
-    def on_modified(self, event):
-        super(brcWatcher, self).on_modified(event)
-        print('saved!')
-        what = 'directory' if event.is_directory else 'file'
-        logging.info("Modified %s: %s", what, event.src_path)
-
+        #Set processed to true if everything went well
+    def setFileName(self, newName):
+        self.file_name = newName;
+        self.processed = False
+    
 def createObserver(path, event_handler):
     observer = Observer()
     observer.schedule(event_handler, path, recursive=True)
