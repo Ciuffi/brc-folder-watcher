@@ -19,7 +19,6 @@ class brcWatcher(FileSystemEventHandler):
         #Make sure the file isn't being removed.
         if (self.dirName not in event.dest_path or self.dirName in event.src_path):
             return
-        
         #move the file
         try:
             os.rename(f'{os.getcwd()}/{self.dirName}/{event.src_path[2:]}', f'{os.getcwd()}/{self.dirName}/{self.file_name}.txt')
