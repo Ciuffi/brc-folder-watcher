@@ -40,10 +40,14 @@ export default {
   },
   methods: {
     async getRunData () {
-      const response = await this.axios.get('/api/currentRun')
-      this.processed = response.data.processed
-      this.filename = response.data.filename
-      this.error = response.data.error
+      try {
+        const response = await this.axios.get('/api/currentRun')
+        this.processed = response.data.processed
+        this.filename = response.data.filename
+        this.error = response.data.error
+      } catch (error) {
+        this.filename = 'unset'
+      }
     },
     async submit (filename) {
       const form = new FormData()

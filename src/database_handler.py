@@ -30,7 +30,11 @@ class database_handler():
 
     def get_last_run(self) -> dict:
         """Get the last/current run"""
-        return self.collection.find({}).sort([("_id", pymongo.DESCENDING)]).limit(1)[0]
+        lastRun = self.collection.find({}).sort([("_id", pymongo.DESCENDING)]).limit(1)
+        if (lastRun.count() > 0):
+            return lastRun[0]
+        else:
+            return {}
 
     def updateRun(self, id, **kwargs):
         """Update a run with new data"""

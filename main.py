@@ -22,6 +22,8 @@ app = Flask(__name__)
 @app.route('/api/currentRun')
 def currentRun():
     lastRun = db_handler.get_last_run()
+    if (lastRun == {}):
+        return '', 500
     return jsonify(filename=lastRun["name"], 
                    processed=lastRun["processed"],
                    error=lastRun["error"])
