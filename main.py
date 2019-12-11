@@ -1,13 +1,16 @@
 import sys
+
 from src.watcher import createObserver, brcWatcher
+from src.database_handler import database_handler
 import time
 from flask import Flask, request, render_template, jsonify
 
+db_handler = database_handler('mongodb://127.0.0.1:27017/')
 
 #Start folder watcher
 def createWatcher():
     path = '.'
-    brcwatcher = brcWatcher()
+    brcwatcher = brcWatcher(db_handler)
     return path, brcwatcher
 path, event_handler = createWatcher()
 observer = createObserver(path, event_handler)
@@ -18,14 +21,15 @@ app = Flask(__name__)
 
 @app.route('/api/currentRun')
 def currentRun():
-    return jsonify(filename=event_handler.file_name, 
-                   processed=event_handler.processed,
-                   error=event_handler.error)
+    lastRun = db_handler.get_last_run()
+    return jsonify(filename=lastRun["name"], 
+                   processed=lastRun["processed"],
+                   error=lastRun["error"])
+
 @app.route('/api/newRun', methods = ['POST'])
 def newRun():
-    if (request.method == 'POST' and request.form['fileName'] is not None):        
-        event_handler.setFileName(request.form['fileName'])
-        print(event_handler.file_name)
+    if (request.method == 'POST' and request.form['fileName'] is not None):  
+        db_handler.record_run(request.form['fileName'], False, False)      
         return '', 200
     else:
         return '', 500
@@ -34,5 +38,4 @@ def newRun():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def catch_all(path):
-    print(path)
     return render_template("index.html")
