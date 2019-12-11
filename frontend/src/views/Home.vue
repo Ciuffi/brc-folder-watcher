@@ -34,7 +34,8 @@ export default {
       processed: false,
       filename: 'loading...',
       error: false,
-      response: ''
+      response: '',
+      interval: () => {}
     }
   },
   methods: {
@@ -57,8 +58,12 @@ export default {
       await this.getRunData()
     }
   },
-  async mounted () {
-    await this.getRunData()
+  mounted () {
+    this.getRunData()
+    self.interval = setInterval(this.getRunData, 6000)
+  },
+  beforeDestroy () {
+    clearInterval(self.interval)
   }
 }
 </script>
