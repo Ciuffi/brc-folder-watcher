@@ -16,7 +16,7 @@
       <RunInput :submit="submit" :response="response"/>
       <RunStats :error="error" :filename="filename" :processed="processed" />
     </div>
-    <RunHistory />
+    <RunHistory :reload="getHistory" :runs="runs" />
   </div>
 </template>
 
@@ -35,7 +35,8 @@ export default {
       filename: 'loading...',
       error: false,
       response: '',
-      interval: () => {}
+      interval: () => {},
+      runs: []
     }
   },
   methods: {
@@ -48,6 +49,11 @@ export default {
       } catch (error) {
         this.filename = 'unset'
       }
+    },
+    async getHistory () {
+      const response = await this.axios.get('/api/history')
+      this.runs = response.data
+      console.log(this.runs)
     },
     async submit (filename) {
       const form = new FormData()
@@ -64,6 +70,7 @@ export default {
   },
   mounted () {
     this.getRunData()
+    this.getHistory()
     self.interval = setInterval(this.getRunData, 6000)
   },
   beforeDestroy () {
