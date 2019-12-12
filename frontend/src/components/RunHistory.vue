@@ -7,9 +7,9 @@
                 </div>
         </div>
         <div v-if="runs.length > 0" class="card-content">
-            <div v-for="{_id, name, error, processed, created, slims, finished, folder} in processedRuns" :key="_id" class="message" :class="{'is-success': processed, 'is-warning': !processed && !error, 'is-danger': error}">
+            <div v-for="{pipeline_start, _id, name, error, processed, created, slims, finished, folder} in processedRuns" :key="_id" class="message" :class="{'is-success': processed && !pipeline_start, 'is-warning': !processed && !error && !pipeline_start, 'is-danger': error, 'is-info': !!pipeline_start}">
                   <div class="message-header">
-                    run name: {{name}}
+                    Name: {{name}}
                     <p v-if="!error">processed: {{processed ? 'yes' : 'no'}}</p>
                     <p v-if="error"> Error!</p>
                 </div>
@@ -18,6 +18,7 @@
                     <p><b>Started on:</b> {{new Date(created)}}</p>
                     <p><b>Run finished at: </b> {{finished ? new Date(finished) : 'unfinished'}}</p>
                     <p><b>Run folder: </b> {{folder ? folder : 'unfinished'}}</p>
+                    <p><b>Pipeline started on: </b> {{pipeline_start ? new Date(pipeline_start) : 'unfinished'}}</p>
                 </div>
             </div>
         </div>
@@ -45,7 +46,6 @@ export default {
         run.processed = this.isBool(run.processed)
         return run
       })
-      console.log(newRuns)
       return newRuns
     }
   },

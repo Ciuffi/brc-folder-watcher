@@ -53,7 +53,6 @@ export default {
     async getHistory () {
       const response = await this.axios.get('/api/history')
       this.runs = response.data
-      console.log(this.runs)
     },
     async submit (filename) {
       const form = new FormData()
