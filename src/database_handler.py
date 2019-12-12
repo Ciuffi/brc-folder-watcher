@@ -14,7 +14,11 @@ class database_handler():
         self.client = pymongo.MongoClient(db_string)
         self.db = self.client[self.DATABASE_NAME]
         self.collection = self.db[self.COLLECTION_NAME]
-    
+
+    @staticmethod
+    def toJsString(boolean):
+        return 'true' if boolean else 'false'
+
     def record_run(self, run_name: str, processed: bool, error: bool) -> None:
         """Record a new run. All paremeters are required """
         self.collection.insert_one({
@@ -27,6 +31,9 @@ class database_handler():
     def get_run_names(self) -> Cursor:
         """Return the Name and Ids of all runs"""
         return self.collection.find({}, {"name": 1, "_id": 1})
+
+    def get_run_history(self) -> Cursor:
+        return self.collection.find().sort([("_id", pymongo.DESCENDING)]).limit(10)
 
     def get_last_run(self) -> dict:
         """Get the last/current run"""
