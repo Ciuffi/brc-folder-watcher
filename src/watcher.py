@@ -2,6 +2,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 import logging
 import os
+from datetime import datetime
 from src.database_handler import database_handler
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(message)s',
@@ -26,8 +27,10 @@ class brcWatcher(FileSystemEventHandler):
         #move the file
         try:
             file_start = event.src_path.rfind('/')
-            os.rename(f'{os.getcwd()}/{self.dirName}/{event.src_path[file_start:]}', f'{os.getcwd()}/{self.dirName}/{lastRun["name"]}.txt')
-            self.db_handler.updateRun(lastRun["_id"], processed=True, error=False)
+            og_file_path = f'{os.getcwd()}/{self.dirName}/{event.src_path[file_start:]}'
+            new_file_path = f'{os.getcwd()}/{self.dirName}/{lastRun["name"]}.txt'
+            os.rename(og_file_path, new_file_path)
+            self.db_handler.updateRun(lastRun["_id"], folder=new_file_path, finished=datetime.utcnow(), processed=True, error=False)
         except Exception as e:
             print(e)
             self.db_handler.updateRun(lastRun["_id"], processed=False, error=True)
