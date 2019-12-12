@@ -28,6 +28,13 @@ def currentRun():
                    processed=lastRun["processed"],
                    error=lastRun["error"])
 
+
+@app.route('/api/history')
+def history():
+    history = db_handler.get_run_history()
+    historyList = map(lambda x: {k: db_handler.toJsString(v) if type(v) == bool else str(v) for k, v in x.items()}, history)
+    return jsonify(list(historyList))
+
 @app.route('/api/newRun', methods = ['POST'])
 def newRun():
     if (request.method == 'POST' and request.form['fileName'] is not None):  
