@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/ciuffi/.local/share/virtualenvs/brcwatcher-ghMu5US5/bin/python",
+    "python.pythonPath": "/home/ciuffi/.local/share/virtualenvs/brc-folder-watcher-d7jCC3D8/bin/python",
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true
 }

@@ -4,12 +4,15 @@ from pymongo.collection import Collection
 from pymongo.database import Database
 from pymongo.cursor import Cursor
 from datetime import datetime
+
+
 class database_handler():
     client: pymongo.MongoClient
     COLLECTION_NAME = 'runs'
     DATABASE_NAME = 'brc'
     db: Database
     collection: Collection
+
     def __init__(self, db_string):
         self.client = pymongo.MongoClient(db_string)
         self.db = self.client[self.DATABASE_NAME]
@@ -27,7 +30,7 @@ class database_handler():
             "error": error,
             "created": datetime.utcnow()
         })
-    
+
     def get_run_names(self) -> Cursor:
         """Return the Name and Ids of all runs"""
         return self.collection.find({}, {"name": 1, "_id": 1})
@@ -37,7 +40,8 @@ class database_handler():
 
     def get_last_run(self) -> dict:
         """Get the last/current run"""
-        lastRun = self.collection.find({}).sort([("_id", pymongo.DESCENDING)]).limit(1)
+        lastRun = self.collection.find({}).sort(
+            [("_id", pymongo.DESCENDING)]).limit(1)
         if (lastRun.count() > 0):
             return lastRun[0]
         else:
